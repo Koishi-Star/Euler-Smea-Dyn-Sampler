@@ -174,7 +174,8 @@ def sample_euler_max(model, x, sigmas, extra_args=None, callback=None, disable=N
     return x
 
 
-def overall_sampling_step(x, model, dt, sigma_hat, **extra_args):
+@torch.no_grad()
+def dy_sampling_step(x, model, dt, sigma_hat, **extra_args):
 
     # 先判断输入的形状类型
     original_shape = x.shape
@@ -203,7 +204,7 @@ def overall_sampling_step(x, model, dt, sigma_hat, **extra_args):
     d = to_d(c, sigma_hat, denoised)
     c = c + d * dt
 
-    d_list = denoised.view(1, 4, m * n, 1, 1)
+    d_list = c.view(1, 4, m * n, 1, 1)
     a_list[:, :, :, 1, 1] = d_list[:, :, :, 0, 0]
     x = a_list.view(1, 4, m, n, 2, 2).permute(0, 1, 2, 4, 3, 5).reshape(1, 4, 2 * m, 2 * n)
     # print("成功整体采样")
@@ -225,8 +226,8 @@ def overall_sampling_step(x, model, dt, sigma_hat, **extra_args):
 
 
 @torch.no_grad()
-def sample_euler_smea(model, x, sigmas, extra_args=None, callback=None, disable=None, s_churn=0., s_tmin=0.,
-                   s_tmax=float('inf'), s_noise=1.):
+def sample_euler_dy(model, x, sigmas, extra_args=None, callback=None, disable=None, s_churn=0., s_tmin=0.,
+                               s_tmax=float('inf'), s_noise=1.):
     extra_args = {} if extra_args is None else extra_args
     s_in = x.new_ones([x.shape[0]])
     for i in trange(len(sigmas) - 1, disable=disable):
@@ -237,8 +238,6 @@ def sample_euler_smea(model, x, sigmas, extra_args=None, callback=None, disable=
         sigma_hat = sigmas[i] * (gamma + 1)
         # print(sigma_hat)
         dt = sigmas[i + 1] - sigma_hat
-        if i // 2 == 1:
-            x = overall_sampling_step(x, model, dt, sigma_hat, **extra_args)
         if gamma > 0:
             x = x - eps * (sigma_hat ** 2 - sigmas[i] ** 2) ** 0.5
         denoised = model(x, sigma_hat * s_in, **extra_args)
@@ -247,6 +246,240 @@ def sample_euler_smea(model, x, sigmas, extra_args=None, callback=None, disable=
             callback({'x': x, 'i': i, 'sigma': sigmas[i], 'sigma_hat': sigma_hat, 'denoised': denoised})
         # Euler method
         x = x + d * dt
+        if sigmas[i + 1] > 0:
+            if i // 2 == 1:
+                x = dy_sampling_step(x, model, dt, sigma_hat, **extra_args)
+    return x
+
+@torch.no_grad()
+def dy_average_sampling_step(x, model, dt, sigma_hat=1., **extra_args):
+
+    original_shape = x.shape
+    m, n = original_shape[2] // 2, original_shape[3] // 2
+
+    # 判断并处理额外的行和列
+    extra_row = original_shape[2] % 2 == 1
+    extra_col = original_shape[3] % 2 == 1
+    if extra_row:
+        extra_row_content = x[:, :, -1:, :]
+        x = x[:, :, :-1, :]
+    if extra_col:
+        extra_col_content = x[:, :, :, -1:]
+        x = x[:, :, :, :-1]
+
+    # 分割、计算平均值、重新组合
+    a_list = x.unfold(2, 2, 2).unfold(3, 2, 2).contiguous().view(1, 4, m * n, 2, 2)
+    b_list = a_list.mean(dim=[3, 4], keepdim=True)
+    c = b_list.squeeze(-1).squeeze(-1).view(1, 4, m, n)
+
+    denoised = model(c, sigma_hat * c.new_ones([c.shape[0]]), **extra_args)
+    d = to_d(c, sigma_hat, denoised)
+    c = c + d * dt
+
+    d_list = c.view(1, 4, m * n, 1, 1).expand(-1, -1, -1, 2, 2)
+    a_list = d_list.reshape(1, 4, m, n, 2, 2).permute(0, 1, 2, 4, 3, 5).reshape(1, 4, 2 * m, 2 * n)
+
+    # 添加额外的行和列（如果有）
+    if extra_row or extra_col:
+        x_expanded = torch.zeros(original_shape, dtype=a_list.dtype, device=a_list.device)
+        x_expanded[:, :, :2 * m, :2 * n] = a_list
+        if extra_row:
+            x_expanded[:, :, -1:, :2 * n + 1] = extra_row_content
+        if extra_col:
+            x_expanded[:, :, :2 * m, -1:] = extra_col_content
+        if extra_row and extra_col:
+            x_expanded[:, :, -1:, -1:] = extra_col_content[:, :, -1:, :]
+        x = x_expanded
+    else:
+        x = a_list
+
+    return x
+
+
+@torch.no_grad()
+def sample_euler_dy_avg(model, x, sigmas, extra_args=None, callback=None, disable=None, s_churn=0., s_tmin=0.,
+                               s_tmax=float('inf'), s_noise=1.):
+    extra_args = {} if extra_args is None else extra_args
+    s_in = x.new_ones([x.shape[0]])
+    for i in trange(len(sigmas) - 1, disable=disable):
+        # print(i)
+        # i第一步为0
+        gamma = max(s_churn / (len(sigmas) - 1), 2 ** 0.5 - 1) if s_tmin <= sigmas[i] <= s_tmax else 0.
+        eps = torch.randn_like(x) * s_noise
+        sigma_hat = sigmas[i] * (gamma + 1)
+        # print(sigma_hat)
+        dt = sigmas[i + 1] - sigma_hat
+        if gamma > 0:
+            x = x - eps * (sigma_hat ** 2 - sigmas[i] ** 2) ** 0.5
+        denoised = model(x, sigma_hat * s_in, **extra_args)
+        d = to_d(x, sigma_hat, denoised)
+        if callback is not None:
+            callback({'x': x, 'i': i, 'sigma': sigmas[i], 'sigma_hat': sigma_hat, 'denoised': denoised})
+        # Euler method
+        x = x + d * dt
+        if sigmas[i + 1] > 0:
+            if i // 2 == 1:
+                x = dy_average_sampling_step(x, model, dt, sigma_hat, **extra_args)
+    return x
+
+@torch.no_grad()
+def dy2_sampling_step(x, model, dt, sigma_hat, **extra_args):
+
+    # 先判断输入的形状类型
+    original_shape = x.shape
+    # 计算m和n
+    m1, n1 = original_shape[2] // 2, original_shape[3] // 2
+    extra_row = x.shape[2] % 2 == 1
+    extra_col = x.shape[3] % 2 == 1
+
+    # 提取多余的行和列
+    if extra_row:
+        extra_row_content = x[:, :, -1:, :]
+        x = x[:, :, :-1, :]
+        # print("成功提取多余行")
+        # print(x0.shape)
+    if extra_col:
+        extra_col_content = x[:, :, :, -1:]
+        x = x[:, :, :, :-1]
+        # print("成功提取多余列")
+        # print(x0.shape)
+
+    # 之前的处理逻辑
+    a1_list = x.unfold(2, 2, 2).unfold(3, 2, 2).contiguous().view(1, 4, m1 * n1, 2, 2)
+    c1 = a1_list[:, :, :, 1, 1].view(1, 4, m1, n1)
+
+    m2, n2 = c1.shape[2] // 2, c1.shape[3] // 2
+    a2_list = c1.unfold(2, 2, 2).unfold(3, 2, 2).contiguous().view(1, 4, m2 * n2, 2, 2)
+    c2 = a2_list[:, :, :, 1, 1].view(1, 4, m2, n2)
+
+    denoised2 = model(c2, sigma_hat * c2.new_ones([c2.shape[0]]), **extra_args)
+    d2 = to_d(c2, sigma_hat, denoised2)
+    c2 = c2 + d2 * dt
+
+    d2_list = c2.view(1, 4, m2 * n2, 1, 1)
+    a2_list[:, :, :, 1, 1] = d2_list[:, :, :, 0, 0]
+    c1 = a2_list.view(1, 4, m2, n2, 2, 2).permute(0, 1, 2, 4, 3, 5).reshape(1, 4, 2 * m2, 2 * n2)
+
+    denoised1 = model(c1, sigma_hat * c1.new_ones([c1.shape[0]]), **extra_args)
+    d1 = to_d(c1, sigma_hat, denoised1)
+    c1 = c1 + d1 * dt
+
+    d1_list = c1.view(1, 4, m1 * n1, 1, 1)
+    a1_list[:, :, :, 1, 1] = d1_list[:, :, :, 0, 0]
+    x = a1_list.view(1, 4, m1, n1, 2, 2).permute(0, 1, 2, 4, 3, 5).reshape(1, 4, 2 * m1, 2 * n1)
+    # print("成功整体采样")
+    # print(x1.shape)
+
+    # 判断是否需要添加零行或零列
+    if extra_row or extra_col:
+        x_expanded = torch.zeros(original_shape, dtype=x.dtype, device=x.device)
+        x_expanded[:, :, :2 * m1, :2 * n1] = x
+        if extra_row:
+            x_expanded[:, :, -1:, :2 * n1 + 1] = extra_row_content
+        if extra_col:
+            x_expanded[:, :, :2 * m1, -1:] = extra_col_content
+        if extra_row and extra_col:
+            x_expanded[:, :, -1:, -1:] = extra_col_content[:, :, -1:, :]
+        x = x_expanded
+
+    return x
+
+
+@torch.no_grad()
+def sample_euler_dy2(model, x, sigmas, extra_args=None, callback=None, disable=None, s_churn=0., s_tmin=0.,
+                               s_tmax=float('inf'), s_noise=1.):
+    extra_args = {} if extra_args is None else extra_args
+    s_in = x.new_ones([x.shape[0]])
+    for i in trange(len(sigmas) - 1, disable=disable):
+        # print(i)
+        # i第一步为0
+        gamma = max(s_churn / (len(sigmas) - 1), 2 ** 0.5 - 1) if s_tmin <= sigmas[i] <= s_tmax else 0.
+        eps = torch.randn_like(x) * s_noise
+        sigma_hat = sigmas[i] * (gamma + 1)
+        # print(sigma_hat)
+        dt = sigmas[i + 1] - sigma_hat
+        if gamma > 0:
+            x = x - eps * (sigma_hat ** 2 - sigmas[i] ** 2) ** 0.5
+        denoised = model(x, sigma_hat * s_in, **extra_args)
+        d = to_d(x, sigma_hat, denoised)
+        if callback is not None:
+            callback({'x': x, 'i': i, 'sigma': sigmas[i], 'sigma_hat': sigma_hat, 'denoised': denoised})
+        # Euler method
+        x = x + d * dt
+        if sigmas[i + 1] > 0:
+            if i // 2 == 1:
+                x = dy2_sampling_step(x, model, dt, sigma_hat, **extra_args)
+    return x
+
+@torch.no_grad()
+def dyn_torch_func_sampling_step(x, model, dt, sigma_hat, **extra_args):
+
+    original_size = (x.shape[2], x.shape[3])
+    h_scale_factor = (0.5,1.)
+    w_scale_factor = (1.,0.5)
+
+    def dy_step(tensor_in, factor_in):
+        tensor_in = torch.nn.functional.interpolate(tensor_in, size=None, scale_factor=factor_in, mode='bilinear',
+                                                    align_corners=None,recompute_scale_factor=None)
+        return tensor_in
+
+    def sampling_step(tensor_in, model, dt, sigma_hat, **extra_args):
+        denoised = model(tensor_in, sigma_hat * tensor_in.new_ones([tensor_in.shape[0]]), **extra_args)
+        d = to_d(tensor_in, sigma_hat, denoised)
+        tensor_in = tensor_in + d * dt
+        return tensor_in
+
+    def dyn(tensor_in):
+        # print("调用dyn时输入尺寸为:",tensor_in.shape)
+        if tensor_in.shape[2] > 4:
+            tensor_in = dy_step(tensor_in, h_scale_factor)
+            if tensor_in.shape[3] > 4:
+                tensor_in = dy_step(tensor_in, w_scale_factor)
+            tensor_in = sampling_step(tensor_in, model, dt, sigma_hat, **extra_args)
+            dyn(tensor_in)
+        if tensor_in.shape[3] > 4:
+            tensor_in = dy_step(tensor_in, w_scale_factor)
+            if tensor_in.shape[2] > 4:
+                tensor_in = dy_step(tensor_in, h_scale_factor)
+            tensor_in = sampling_step(tensor_in, model, dt, sigma_hat, **extra_args)
+            dyn(tensor_in)
+        return tensor_in
+    # print("调用采样方法时输入尺寸为",x.shape)
+    x = torch.nn.functional.interpolate(dyn(x), size=original_size, scale_factor=None, mode='bilinear',
+                                                    align_corners=None,recompute_scale_factor=None)
+    # print("dyn采样后x的尺寸是:",x.shape)
+
+    return x
+
+
+@torch.no_grad()
+def sample_euler_dyn(model, x, sigmas, extra_args=None, callback=None, disable=None, s_churn=0., s_tmin=0.,
+                               s_tmax=float('inf'), s_noise=1.):
+    extra_args = {} if extra_args is None else extra_args
+    s_in = x.new_ones([x.shape[0]])
+    for i in trange(len(sigmas) - 1, disable=disable):
+        # print(i)
+        # i第一步为0
+        gamma = max(s_churn / (len(sigmas) - 1), 2 ** 0.5 - 1) if s_tmin <= sigmas[i] <= s_tmax else 0.
+        eps = torch.randn_like(x) * s_noise
+        sigma_hat = sigmas[i] * (gamma + 1)
+        # print(sigma_hat)
+        dt = sigmas[i + 1] - sigma_hat
+        if gamma > 0:
+            x = x - eps * (sigma_hat ** 2 - sigmas[i] ** 2) ** 0.5
+        denoised = model(x, sigma_hat * s_in, **extra_args)
+        d = to_d(x, sigma_hat, denoised)
+        if callback is not None:
+            callback({'x': x, 'i': i, 'sigma': sigmas[i], 'sigma_hat': sigma_hat, 'denoised': denoised})
+        # Euler method
+        x = x + d * dt
+        if sigmas[i + 1] > 0:
+            if i // 2 == 1:
+                x = dyn_torch_func_sampling_step(x, model, dt, sigma_hat, **extra_args)
+    return x
+
+def upscale_sampling(x):
+
     return x
 
 
