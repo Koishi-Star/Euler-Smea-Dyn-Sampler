@@ -2,7 +2,7 @@
 def dy_sampling_step(x, model, dt, sigma_hat, **extra_args):
 
     original_shape = x.shape
-    m, n = original_shape[2] // 2, original_shape[3] // 2
+    batch_size, m, n = original_shape[0], original_shape[2] // 2, original_shape[3] // 2
     extra_row = x.shape[2] % 2 == 1
     extra_col = x.shape[3] % 2 == 1
 
@@ -13,16 +13,16 @@ def dy_sampling_step(x, model, dt, sigma_hat, **extra_args):
         extra_col_content = x[:, :, :, -1:]
         x = x[:, :, :, :-1]
 
-    a_list = x.unfold(2, 2, 2).unfold(3, 2, 2).contiguous().view(1, 4, m * n, 2, 2)
-    c = a_list[:, :, :, 1, 1].view(1, 4, m, n)
+    a_list = x.unfold(2, 2, 2).unfold(3, 2, 2).contiguous().view(batch_size, 4, m * n, 2, 2)
+    c = a_list[:, :, :, 1, 1].view(batch_size, 4, m, n)
 
     denoised = model(c, sigma_hat * c.new_ones([c.shape[0]]), **extra_args)
     d = to_d(c, sigma_hat, denoised)
     c = c + d * dt
 
-    d_list = c.view(1, 4, m * n, 1, 1)
+    d_list = c.view(batch_size, 4, m * n, 1, 1)
     a_list[:, :, :, 1, 1] = d_list[:, :, :, 0, 0]
-    x = a_list.view(1, 4, m, n, 2, 2).permute(0, 1, 2, 4, 3, 5).reshape(1, 4, 2 * m, 2 * n)
+    x = a_list.view(batch_size, 4, m, n, 2, 2).permute(0, 1, 2, 4, 3, 5).reshape(batch_size, 4, 2 * m, 2 * n)
 
     if extra_row or extra_col:
         x_expanded = torch.zeros(original_shape, dtype=x.dtype, device=x.device)
