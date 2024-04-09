@@ -110,9 +110,9 @@ def sample_euler_smea_dy(model, x, sigmas, extra_args=None, callback=None, disab
         # Euler method
         x = x + d * dt
         if sigmas[i + 1] > 0:
-            if i + 1 // 2 == 1:
+            if (i + 1) // 2 == 1:
                 x = dy_sampling_step(x, model, dt, sigma_hat, **extra_args)
-            if i + 1 // 2 == 0:
+            if (i + 1) // 2 == 0:
                 x = smea_sampling_step(x, model, dt, sigma_hat, **extra_args)
         if callback is not None:
             callback({'x': x, 'i': i, 'sigma': sigmas[i], 'sigma_hat': sigma_hat, 'denoised': denoised})
