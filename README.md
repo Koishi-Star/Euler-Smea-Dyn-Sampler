@@ -1,3 +1,9 @@
+# 2024.04.09
+
+Add `__init__.py` for ComfyUI. Thanks for CapsAdmin. I don't use ComfyUI so I can't tell you how to add it, sorry.
+
+为ComfyUI增加`__init__.py`  感谢CapsAdmin  我不用ComfyUI所以我没法告诉你怎么添加它，抱歉
+
 # Euler Smea Dyn Sampler
 
 A sampling method based on Euler's approach, designed to generate superior imagery.
