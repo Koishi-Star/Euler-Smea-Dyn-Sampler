@@ -1,3 +1,25 @@
+# 2024.04.10
+
+![image](https://github.com/Koishi-Star/Euler-Smea-Dyn-Sampler/assets/66173435/aa3dd88a-5760-4589-857c-5717a3253ea0)
+
+Find a way to avoid errors during inpaint and extensions. 
+
+**Please note that this is just a temporary solution and doesn't actually resolve the issue.It will try to use Euler method if error occurs.**
+
+P.S.I trying to fix it……but all methods seems doesn't work.I've working for it over 36 hours.
+
+**Suggestions from anyone are welcome**. 
+
+I need to take a short break and prepare for my other project.*<== A mobile phone app base on flutter, using for TRPG.(No worries, I don't mean I will give up this project,also not about diverting traffic either. LOL.)*
+
+想了个办法避免在局部重绘以及拓展中的报错。
+
+**请注意，这只是一个临时解决方案，实际上并没有解决问题。如果出现错误，它将尝试使用欧拉方法。**
+
+我努力尝试修复……但所有方案都不起作用。我已经连续工作了36小时以上。**欢迎任何人提出建议。**
+，
+我需要稍微休息一下，并且为我的其他项目做准备。*<== 一个基于Flutter的手机应用，用于TRPG。（别担心，我不是说我要放弃这个项目，也不是引流。）*
+
 # 2024.04.09
 
 Add `__init__.py` for ComfyUI. Thanks for CapsAdmin. I don't use ComfyUI so I can't tell you how to add it, sorry.
