@@ -18,12 +18,12 @@ def dy_sampling_step(x, model, dt, sigma_hat, **extra_args):
 
     # Please note that this is just a temporary solution and doesn't actually resolve the issue.
     try:
-        print('test before denoised')
+        # print('test before denoised')
         denoised = model(c, sigma_hat * c.new_ones([c.shape[0]]), **extra_args)
         d = to_d(c, sigma_hat, denoised)
         c = c + d * dt
     except Exception as e:
-        print('can not denoised. Using original Euler method.')
+        # print('can not denoised. Using original Euler method.')
         return x
 
     d_list = c.view(batch_size, 4, m * n, 1, 1)
