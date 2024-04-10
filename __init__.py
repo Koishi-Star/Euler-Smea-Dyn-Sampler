@@ -34,9 +34,15 @@ def dy_sampling_step(x, model, dt, sigma_hat, **extra_args):
     a_list = x.unfold(2, 2, 2).unfold(3, 2, 2).contiguous().view(batch_size, 4, m * n, 2, 2)
     c = a_list[:, :, :, 1, 1].view(batch_size, 4, m, n)
 
-    denoised = model(c, sigma_hat * c.new_ones([c.shape[0]]), **extra_args)
-    d = to_d(c, sigma_hat, denoised)
-    c = c + d * dt
+     try:
+        # print('test before denoised')
+        c_in = c.new_ones([c.shape[0]])
+        denoised2 = model2(c, sigma_hat2 * c_in, **extra_args)
+        d2 = to_d(c, sigma_hat2, denoised2)
+        c = c + d2 * dt2
+    except Exception as e:
+        # print('can not denoised. Using original Euler method.')
+        return x2
 
     d_list = c.view(batch_size, 4, m * n, 1, 1)
     a_list[:, :, :, 1, 1] = d_list[:, :, :, 0, 0]
