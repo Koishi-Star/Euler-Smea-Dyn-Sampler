@@ -1,3 +1,29 @@
+# 2024.04.11 Important!Can be use as a extension!
+
+Thanks for @pamparamm, his selfless work has been a great help.
+
+Now this sampler can be use as a extension for **ComfyUI** and **WebUI from Automatic1111**.
+
+The inpainting bug will be fixed.(**At least doesn't throw any exceptions.**)
+
+Thanks again.
+
+Another extension from @licyk , in repo: https://github.com/licyk/advanced_euler_sampler_extension **suitable for 1.8 version**
+
+It's also useful, and thanks hard efforts from licky, too.
+
+感谢 @pamparamm，他的无私工作帮助很大。
+
+现在，这个采样器可以作为 **ComfyUI** 和 **Automatic1111 的 WebUI** 的扩展来使用。
+
+修复了inpainting的bug。（**至少不再抛出异常。**）
+
+再次感谢。
+
+另一个拓展来自@licyk，位于： https://github.com/licyk/advanced_euler_sampler_extension **适用于1.8**
+
+也同样很好用， 同样感谢licyk的辛勤努力。
+
 # 2024.04.10
 
 ![image](https://github.com/Koishi-Star/Euler-Smea-Dyn-Sampler/assets/66173435/aa3dd88a-5760-4589-857c-5717a3253ea0)
@@ -75,7 +101,7 @@ Smea采样器理论上将增加图片的细节（**无法达到Nai3让图片闪�
 ![xyz_grid-0019-114515-1girl,manhattan cafe _(umamusume_),umamusume,finger_on_trigger,upper body,masterpiece,best quality,highres,](https://github.com/Koishi-Star/Euler-Smea-Dyn-Sampler/assets/66173435/2f9d1a68-3a28-47e5-a1a8-ce14e2ad4563)
 
 
-# how to use
+# how to use(This has become outdated, but it will be retained)
 
 **step.1:** 打开`sd-webui-aki-v4.6\repositories\k-diffusion\k_diffusion`文件夹，打开其中的`sampling.py`文件（可以用记事本打开，称为文件1）
 
