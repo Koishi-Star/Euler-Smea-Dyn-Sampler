@@ -12,6 +12,8 @@ Another extension from @licyk , in repo: https://github.com/licyk/advanced_euler
 
 It's also useful, and thanks hard efforts from licky, too.
 
+In the future, I will work on making dy step compatible with more samplers (such as the DPM series).
+
 感谢 @pamparamm，他的无私工作帮助很大。
 
 现在，这个采样器可以作为 **ComfyUI** 和 **Automatic1111 的 WebUI** 的扩展来使用。
@@ -23,6 +25,8 @@ It's also useful, and thanks hard efforts from licky, too.
 另一个拓展来自@licyk，位于： https://github.com/licyk/advanced_euler_sampler_extension **适用于1.8**
 
 也同样很好用， 同样感谢licyk的辛勤努力。
+
+之后我会想办法让dy step适配更多采样器（例如dpm系列）。
 
 # 2024.04.10
 
