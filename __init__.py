@@ -14,4 +14,4 @@ if smea_utils.BACKEND == "ComfyUI":
 
         smea_utils.INITIALIZED = True
 
-    NODE_CLASS_MAPPINGS = {}
+NODE_CLASS_MAPPINGS = {}

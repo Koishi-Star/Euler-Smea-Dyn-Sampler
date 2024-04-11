@@ -2,7 +2,7 @@ try:
     from scripts import smea_utils
     from scripts.smea_sampling import sample_euler_dy, sample_euler_smea_dy
 
-    if smea_utils.BACKEND in ["WebUI", "Forge"]:
+    if smea_utils.BACKEND == "WebUI":
         from modules import scripts, sd_samplers_common, sd_samplers
         from modules.sd_samplers_kdiffusion import sampler_extra_params, KDiffusionSampler
 
