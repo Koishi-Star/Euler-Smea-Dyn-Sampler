@@ -1,4 +1,4 @@
-# 2024.04.11 Important!Can be use as a extension!
+# 2024.04.11 Important! This repo can be use as a extension!
 
 Thanks for @pamparamm, his selfless work has been a great help.
 
