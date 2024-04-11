@@ -7,7 +7,7 @@ INITIALIZED = False
 
 if not BACKEND:
     try:
-        sampling = import_module("modules.sd_samplers_kdiffusion.k_diffusion.sampling")
+        sampling = import_module("k_diffusion.sampling")
         BACKEND = "WebUI"
     except ImportError:
         pass
