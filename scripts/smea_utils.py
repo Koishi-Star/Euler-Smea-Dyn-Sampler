@@ -7,15 +7,9 @@ INITIALIZED = False
 
 if not BACKEND:
     try:
+        _ = import_module("modules.sd_samplers_kdiffusion")
         sampling = import_module("k_diffusion.sampling")
         BACKEND = "WebUI"
-    except ImportError:
-        pass
-
-if not BACKEND:
-    try:
-        sampling = import_module("ldm_patched.k_diffusion.sampling")
-        BACKEND = "Forge"
     except ImportError:
         pass
 
@@ -33,14 +27,14 @@ class _Rescaler:
         self.x = x
         self.mode = mode
         self.extra_args = extra_args
-        if BACKEND in ["WebUI", "Forge"]:
+        if BACKEND == "WebUI":
             self.init_latent, self.mask, self.nmask = model.init_latent, model.mask, model.nmask
         if BACKEND == "ComfyUI":
             self.latent_image, self.noise = model.latent_image, model.noise
             self.denoise_mask = self.extra_args.get("denoise_mask", None)
 
     def __enter__(self):
-        if BACKEND in ["WebUI", "Forge"]:
+        if BACKEND == "WebUI":
             if self.init_latent is not None:
                 self.model.init_latent = torch.nn.functional.interpolate(input=self.init_latent, size=self.x.shape[2:4], mode=self.mode)
             if self.mask is not None:
@@ -58,7 +52,7 @@ class _Rescaler:
         return self
 
     def __exit__(self, type, value, traceback):
-        if BACKEND in ["WebUI", "Forge"]:
+        if BACKEND == "WebUI":
             del self.model.init_latent, self.model.mask, self.model.nmask
             self.model.init_latent, self.model.mask, self.model.nmask = self.init_latent, self.mask, self.nmask
         if BACKEND == "ComfyUI":
