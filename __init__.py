@@ -1,5 +1,5 @@
-from .scripts import smea_utils
-from .scripts.smea_sampling import sample_euler_dy, sample_euler_smea_dy
+from .esds_scripts import smea_utils
+from .esds_scripts.smea_sampling import sample_euler_dy, sample_euler_smea_dy
 
 if smea_utils.BACKEND == "ComfyUI":
     if not smea_utils.INITIALIZED:
