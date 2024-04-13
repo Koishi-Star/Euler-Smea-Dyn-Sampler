@@ -1,3 +1,13 @@
+# 2024.04.13 Fix Bug In ComfyUI
+
+Added a folder named `esds_scripts` for ComfyUI import. This will fix the overwrite error that occurs in ComfyUI when other extensions use `scripts` as the import folder (I really hope ComfyUI will standardize its interfaces and version dependencies).
+
+P.S.You may find some commits with no means, that because I am not familiar with Github, and try times. So don't care.
+
+添加了名为`esds_scripts`的文件夹，用于ComfyUI导入。这将修复在ComfyUI中存在其他插件时，若其他插件将`scripts`作为导入文件夹时引起的覆盖错误。（真希望ComfyUI能规范一下它的接口和版本依赖）。
+
+P.S.你可能会发现一些无意义的提交，这是因为我不熟悉Github的使用，并且尝试了几次。别在意。
+
 # 2024.04.11 Important! This repo can be use as a extension!
 
 Thanks for @pamparamm, his selfless work has been a great help.
