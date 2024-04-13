@@ -1,8 +1,8 @@
 try:
-    from scripts import smea_utils
-    from scripts.smea_sampling import sample_euler_dy, sample_euler_smea_dy
+    import smea_sampling
+    from smea_sampling import sample_euler_dy, sample_euler_smea_dy
 
-    if smea_utils.BACKEND == "WebUI":
+    if smea_sampling.BACKEND == "WebUI":
         from modules import scripts, sd_samplers_common, sd_samplers
         from modules.sd_samplers_kdiffusion import sampler_extra_params, KDiffusionSampler
 
@@ -11,7 +11,7 @@ try:
                 "SMEA Samplers"
 
             def __init__(self):
-                if not smea_utils.INITIALIZED:
+                if not smea_sampling.INITIALIZED:
                     samplers_smea = [
                         ("Euler Dy", sample_euler_dy, ["k_euler_dy"], {}),
                         ("Euler SMEA Dy", sample_euler_smea_dy, ["k_euler_smea_dy"], {}),
@@ -26,7 +26,7 @@ try:
                     sd_samplers.all_samplers.extend(samplers_data_smea)
                     sd_samplers.all_samplers_map = {x.name: x for x in sd_samplers.all_samplers}
                     sd_samplers.set_samplers()
-                    smea_utils.INITIALIZED = True
+                    smea_sampling.INITIALIZED = True
 
-except ImportError:
+except ImportError as _:
     pass
