@@ -2,7 +2,7 @@ from tqdm.auto import trange
 import torch
 
 try:
-    from esds_scripts.smea_utils import _Rescaler, sampling
+    from scripts.smea_utils import _Rescaler, sampling
 except ModuleNotFoundError:
     from .smea_utils import _Rescaler, sampling
 
