@@ -1,6 +1,6 @@
 try:
-    from scripts import smea_utils
-    from scripts.smea_sampling import sample_euler_dy, sample_euler_smea_dy
+    from esds_scripts import smea_utils
+    from esds_scripts.smea_sampling import sample_euler_dy, sample_euler_smea_dy
 
     if smea_utils.BACKEND == "WebUI":
         from modules import scripts, sd_samplers_common, sd_samplers
