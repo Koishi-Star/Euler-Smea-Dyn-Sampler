@@ -1,10 +1,16 @@
+# 2024.04.15 Compatible with Stable Cascade Models
+
+Makes dy_step respect original channel count, making it compatible with Stable Cascade models.
+
+使dy_step遵循原本的通道数，使其与Stable Cascade模型相适应。
+
 # 2024.04.13 Fix Bug In ComfyUI
 
-Added a folder named `esds_scripts` for ComfyUI import. This will fix the overwrite error that occurs in ComfyUI when other extensions use `scripts` as the import folder (I really hope ComfyUI will standardize its interfaces and version dependencies).
+Change code for ComfyUI import. This will fix the overwrite error that occurs in ComfyUI when other extensions use `scripts` as the import folder (I really hope ComfyUI will standardize its interfaces and version dependencies).
 
 P.S.You may find some commits with no means, that because I am not familiar with Github, and try times. So don't care.
 
-添加了名为`esds_scripts`的文件夹，用于ComfyUI导入。这将修复在ComfyUI中存在其他插件时，若其他插件将`scripts`作为导入文件夹时引起的覆盖错误。（真希望ComfyUI能规范一下它的接口和版本依赖）。
+更改代码，用于ComfyUI导入。这将修复在ComfyUI中存在其他插件时，若其他插件将`scripts`作为导入文件夹时引起的覆盖错误。（真希望ComfyUI能规范一下它的接口和版本依赖）。
 
 P.S.你可能会发现一些无意义的提交，这是因为我不熟悉Github的使用，并且尝试了几次。别在意。
 
