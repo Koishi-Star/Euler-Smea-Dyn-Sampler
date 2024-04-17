@@ -10,6 +10,9 @@ try:
             def title(self):
                 "SMEA Samplers"
 
+            def show(self, is_img2img):
+                return False
+
             def __init__(self):
                 if not smea_sampling.INITIALIZED:
                     samplers_smea = [
