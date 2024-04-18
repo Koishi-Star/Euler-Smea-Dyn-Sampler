@@ -1,3 +1,16 @@
+# 2024.04.18
+
+阶段性技术报告报告。
+
+这些日子里，我尝试了超过二十种策略，但采样器的质量总是优于euler a却差于euler dy，所以暂时还不能发布euler dy a。我必须承认这和nai3的dyn是不同的东西。我依旧会长期维护这个项目，并为了新的采样方法努力，同时尽可能降低ai的算力需求。
+
+Stage Technical Report
+
+In these days, I have attempted over twenty strategies, but the quality of the sampler is always better than Euler A yet worse than Euler DY. Therefore, I cannot release Euler DY A for the time being. I must acknowledge that this is different from NAI3's DYN. I will continue to maintain this project in the long term and work towards developing new sampling methods while trying to minimize the AI's computing power requirements as much as possible.
+
+![xyz_grid-0036-1234-1girl,heart hands,river,cherry blossoms,hair flower,hair ribbon,cat ears,animal ear fluff,blue eyes,grey hair,short hair,bangs,h](https://github.com/Koishi-Star/Euler-Smea-Dyn-Sampler/assets/66173435/32618333-0228-472e-bfbe-6c1a2e84ae96)
+
+
 # 2024.04.15 Compatible with Stable Cascade Models
 
 Makes dy_step respect original channel count, making it compatible with Stable Cascade models.
