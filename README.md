@@ -1,3 +1,20 @@
+# 2024.04.24
+
+简单分析Dy Step的原理
+
+最近我尝试在https://civitai.com/models/399873/kohaku-xl-epsilon上测试了Euler Dy，效果不尽人意（但在ang3以及pony系列效果不错）。因此我咨询了作者，得到的回复是“模型没有使用任何低分辨率的图片进行训练”。我想这就是原因所在，Euler Dy将图片放在一个小的尺度上，让去噪工作来到模型的舒适区，并给予一个参考。尤其在SD1.5，Euler Dy确保图像始终处于模型的舒适区域。
+
+而在本次的SDXL模型中，它几乎遗忘了如何在小尺度上生成图片。所以，Dy Step的改进方向已经变得很明显：寻找到SDXL模型的舒适区域，并让采样器在SDXL的舒适区工作。
+
+同时我也写了几个其他的采样器，效果平平，达不到Dy Step的效果。如果有人想试试它们，请在评论区留言。
+
+Recently, I attempted to analyze the principle of Dy Step on https://civitai.com/models/399873/kohaku-xl-epsilon using Euler Dy. The results were unsatisfactory (although they performed well on ang3 and pony series). Therefore, I consulted the author and received the response that "the model did not use any low-resolution images for training." I believe this is the reason why. Euler Dy places images on a small scale, allowing denoising to operate within the model's comfort zone and providing a reference. Especially in SD1.5, Euler Dy ensures that the image always remains within the model's comfort zone.
+
+However, in the current SDXL model, it has almost forgotten how to generate images on a small scale. Therefore, the direction for improving Dy Step has become apparent: to find the comfort zone of the SDXL model and enable the sampler to work within the comfort zone of SDXL.
+
+I've also written a few other samplers, but their performance is mediocre and doesn't match up to Dy Step's effectiveness. If anyone wants to try them out, please leave a comment in the discussions.
+
+
 # 2024.04.18
 
 阶段性技术报告报告。
