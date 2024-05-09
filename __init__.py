@@ -8,9 +8,13 @@ if smea_sampling.BACKEND == "ComfyUI":
 
         setattr(k_diffusion_sampling, "sample_euler_dy", sample_euler_dy)
         setattr(k_diffusion_sampling, "sample_euler_smea_dy", sample_euler_smea_dy)
+        setattr(k_diffusion_sampling, "sample_euler_negative", sample_euler_smea_dy)
+        setattr(k_diffusion_sampling, "sample_euler_dy_negative", sample_euler_smea_dy)
 
         SAMPLER_NAMES.append("euler_dy")
         SAMPLER_NAMES.append("euler_smea_dy")
+        SAMPLER_NAMES.append("sample_euler_negative")
+        SAMPLER_NAMES.append("sample_euler_dy_negative")
 
         smea_sampling.INITIALIZED = True
 
