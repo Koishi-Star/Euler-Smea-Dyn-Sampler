@@ -1,0 +1,14 @@
+[project]
+name = "euler-smea-dyn-sampler"
+description = "СomfyUI version of [a/Euler Smea Dyn Sampler](https://github.com/Koishi-Star/Euler-Smea-Dyn-Sampler). It adds samplers directly to KSampler nodes."
+version = "1.0.0"
+license = "LICENSE"
+
+[project.urls]
+Repository = "https://github.com/Koishi-Star/Euler-Smea-Dyn-Sampler"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "Euler-Smea-Dyn-Sampler"
+Icon = ""
