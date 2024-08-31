@@ -1,5 +1,6 @@
 | Catalog |
 | ---- |
+| [2024.08.31 Ready To Add Kohaku_LoNyu_Yog Sampler 添加一个新采样器](#section14) |
 | [2024.05.09 Add Euler Negative And Euler dy Negtive 添加两个新采样器](#section1) |
 | [2024.04.24](#section2) |
 | [2024.04.18 Stage Technical Report 阶段性技术报告](#section3) |
@@ -14,6 +15,48 @@
 | [The technical principles 技术报告](#section12) |
 | [Contact the author 联系作者](#section13) |
 
+<a id="section14"></a>
+## 2024.08.31 Ready To Add Kohaku_LoNyu_Yog Sampler
+
+Add a new sampler named Kohaku_LoNyu_Yog. Recommended number of steps: 10 steps. Since it is a second-order method, it is slower than other methods.
+
+Add a new sampler named Kohaku_LoNyu_Yog. Recommended number of steps: 10 steps. Since it is a second-order method, it is slower than other methods.
+
+Principle: Please refer to the following two images. Since three-dimensional space is a subspace of high-dimensional space, all operations in three-dimensional space must be feasible in high-dimensional space. Therefore, I have used some geometric tricks (as shown in Figure 1), where it is assumed that the tensor and the target image can be simplified to a moving point. All statements in this section refer to the simplified form of the tensor in three-dimensional space.
+
+First, we find -x, calculate the gradient d and d2, and then from Figure 2, we can easily deduce geometrically that (d+d2)/2 must be a vector pointing downward toward the visual direction. Therefore, x+(d+d2)/2 must represent a point that is closer to the target region A. So, by performing denoising here, we can obtain the velocity vector d3. As shown in the figure, (d+d3)/2 is closer to the true target region.
+
+In the last few steps of sampling, you will find that this method deviates from the true region. You can verify this by plotting the image. So we only execute this method for half of the steps.
+
+You may question that if the trajectory of x is a concave function, this theory does not hold at all. This is completely correct. However, this sampling method is always effective, which sufficiently proves that the projection of x onto two or three dimensions must be a convex function.
+
+This sampler does not have a significant improvement in quality and speed (the quality may be slightly improved), but I believe it proves many things, such as the possibility of using geometric methods for analysis in three-dimensional space.
+
+**I am currently goofing off at the company, so test cases and plugins will be submitted later.**
+
+![1](https://github.com/user-attachments/assets/97b67edd-97e3-47eb-95e5-019cf57a981d)
+
+![2](https://github.com/user-attachments/assets/d24e03a7-88ed-4808-ab9c-174e7c3e0631)
+
+
+
+新增一个名为Kohaku_LoNyu_Yog的采样器。推荐步数：10步。由于是二阶方法，速度比其他方法更慢。
+
+原理：请看以下两张图片。由于三维空间是高维空间的一个子空间，三维空间中所有操作在高维空间中一定可行。所以我使用了一些几何技巧（如图1），这里假定tensor和目标图像可以被简化成一个动点。此段中所有表述皆指代tensor在三维空间中的简化形式。
+
+首先求-x，求梯度d和d2，然后看图2，我们可以用几何学轻易推断出`(d+d2)/2`一定是一个指向视觉方向的下的向量。所以，`x+(d+d2)/2`一定代表一个位置更加靠近目标区域A的点。所以，在这里执行去噪可得到速度向量d3.如图所示，`(d+d3)/2`是更加贴近真实目标区域的。
+
+在采样的最后几步，您会发现此法反而偏离了真实区域。您可以通过绘制图像验证这一点。所以我们只在一半的步骤上执行此法。
+
+您可能会质疑，假定x的轨迹是一个凹函数，这套理论就完全不符合了。这完全正确。但本采样方法总是有效，充分说明x在二维/三维上的投影一定是一个凸函数。
+
+本采样器在质量和速度上都没有明显提升（质量上可能有一些略微提高），但我认为它证明了许多东西，例如可以在三维空间采用几何方法进行分析。
+
+**我正在公司摸鱼写这个，所以测试样例和插件会在之后提交。**
+
+![1](https://github.com/user-attachments/assets/97b67edd-97e3-47eb-95e5-019cf57a981d)
+
+![2](https://github.com/user-attachments/assets/d24e03a7-88ed-4808-ab9c-174e7c3e0631)
 
 <a id="section1"></a>
 ## 2024.05.09 Add Euler Negative And Euler dy Negtive
