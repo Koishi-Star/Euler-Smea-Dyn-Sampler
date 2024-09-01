@@ -238,7 +238,7 @@ def sample_Kohaku_LoNyu_Yog(model, x, sigmas, extra_args=None, callback=None, di
         if gamma > 0:
             x = x + eps * (sigma_hat ** 2 - sigmas[i] ** 2) ** 0.5
         denoised = model(x, sigma_hat * s_in, **extra_args)
-        d = to_d(x, sigma_hat, denoised)
+        d = sampling.to_d(x, sigma_hat, denoised)
         sigma_down, sigma_up = get_ancestral_step(sigmas[i], sigmas[i + 1], eta=eta)
         if callback is not None:
             callback({'x': x, 'i': i, 'sigma': sigmas[i], 'sigma_hat': sigma_hat, 'denoised': denoised})
@@ -247,11 +247,11 @@ def sample_Kohaku_LoNyu_Yog(model, x, sigmas, extra_args=None, callback=None, di
         if i <= (len(sigmas) - 1) / 2:
             x2 = - x
             denoised2 = model(x2, sigma_hat * s_in, **extra_args)
-            d2 = to_d(x2, sigma_hat, denoised2)
+            d2 = sampling.to_d(x2, sigma_hat, denoised2)
 
             x3 = x + ((d + d2) / 2) * dt
             denoised3 = model(x3, sigma_hat * s_in, **extra_args)
-            d3 = to_d(x3, sigma_hat, denoised3)
+            d3 = sampling.to_d(x3, sigma_hat, denoised3)
 
             real_d = (d + d3) / 2
             x = x + real_d * dt
