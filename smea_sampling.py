@@ -61,6 +61,10 @@ class _Rescaler:
             self.model.latent_image, self.model.noise = self.latent_image, self.noise
 
 
+def default_noise_sampler(x):
+    return lambda sigma, sigma_next: torch.randn_like(x)
+
+
 @torch.no_grad()
 def dy_sampling_step(x, model, dt, sigma_hat, **extra_args):
     original_shape = x.shape
