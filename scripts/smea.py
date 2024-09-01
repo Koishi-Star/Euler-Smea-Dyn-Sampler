@@ -1,6 +1,6 @@
 try:
     import smea_sampling
-    from smea_sampling import sample_euler_dy, sample_euler_smea_dy, sample_euler_negative, sample_euler_dy_negative
+    from smea_sampling import sample_euler_dy, sample_euler_smea_dy, sample_euler_negative, sample_euler_dy_negative, sample_Kohaku_LoNyu_Yog
 
     if smea_sampling.BACKEND == "WebUI":
         from modules import scripts, sd_samplers_common, sd_samplers
@@ -20,6 +20,7 @@ try:
                         ("Euler SMEA Dy", sample_euler_smea_dy, ["k_euler_smea_dy"], {}),
                         ("Euler Negative", sample_euler_negative, ["k_euler_negative"], {}),
                         ("Euler Negative Dy", sample_euler_dy_negative, ["k_euler_negative_dy"], {}),
+                        ("Kohaku_LoNyu_Yog", sample_Kohaku_LoNyu_Yog, ["k_euler_Kohaku_LoNyu_Yog"], {}),
                     ]
                     samplers_data_smea = [
                         sd_samplers_common.SamplerData(label, lambda model, funcname=funcname: KDiffusionSampler(funcname, model), aliases, options)
@@ -30,6 +31,7 @@ try:
                     sampler_extra_params["sample_euler_smea_dy"] = ["s_churn", "s_tmin", "s_tmax", "s_noise"]
                     sampler_extra_params["sample_euler_negative"] = ["s_churn", "s_tmin", "s_tmax", "s_noise"]
                     sampler_extra_params["sample_euler_dy_negative"] = ["s_churn", "s_tmin", "s_tmax", "s_noise"]
+                    sampler_extra_params["sample_Kohaku_LoNyu_Yog"] = ["s_churn", "s_tmin", "s_tmax", "s_noise"]
                     sd_samplers.all_samplers.extend(samplers_data_smea)
                     sd_samplers.all_samplers_map = {x.name: x for x in sd_samplers.all_samplers}
                     sd_samplers.set_samplers()
