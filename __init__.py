@@ -16,7 +16,7 @@ if smea_sampling.BACKEND == "ComfyUI":
         SAMPLER_NAMES.append("euler_smea_dy")
         SAMPLER_NAMES.append("euler_negative")
         SAMPLER_NAMES.append("euler_dy_negative")
-        SAMPLER_NAMES.append("sample_Kohaku_LoNyu_Yog")
+        SAMPLER_NAMES.append("Kohaku_LoNyu_Yog")
 
         smea_sampling.INITIALIZED = True
 
